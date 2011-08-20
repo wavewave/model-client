@@ -1,7 +1,7 @@
 Name:		model-client
 Version:	0.0
-Synopsis:	
-Description: 	
+Synopsis:	client program that communicates with model-server
+Description: 	client program that communicates with model-server
 License: 	BSD3
 License-file:	LICENSE
 Author:		Ian-Woo Kim
@@ -26,10 +26,13 @@ Library
   ghc-prof-options: -caf-all -auto-all
   Build-Depends: 
                    base>4, mtl>2, directory, filepath,
-                   cmdargs
+                   cmdargs, model-type, HEPUtil >= 0.1.1, 
+                   configparser, parsec>3
+
   Exposed-Modules: 
                    HEP.Automation.Model.Client.Type
                    HEP.Automation.Model.Client.Job
+                   HEP.Automation.Model.Client.Config
                    HEP.Automation.Model.Client.Command
   Other-Modules: 
 

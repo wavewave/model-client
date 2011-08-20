@@ -2,13 +2,35 @@
 
 module HEP.Automation.Model.Client.Type where 
 
-import System.Console.CmdArgs
+import System.FilePath
+import System.Console.CmdArgs hiding (name)
 
-data Model_client = Test 
+data Model_client = Create { config :: FilePath, content :: FilePath }
+                  | Get    { config :: FilePath, name :: String } 
+                  | Put    { config :: FilePath, content :: FilePath } 
+                  | Delete { config :: FilePath, name :: String } 
               deriving (Show,Data,Typeable)
 
-test :: Model_client
-test = Test 
+create :: Model_client
+create = Create { config = "test.conf"
+                , content = "" &= typ "CONTENT" &= argPos 0
+                }
 
-mode = modes [test]
+get :: Model_client 
+get = Get { config = "test.conf" 
+          , name = "" &= typ "NAME" &= argPos 0 
+          } 
+
+put :: Model_client 
+put = Put { config = "test.conf"
+          , content = "" &= typ "CONTENT" &= argPos 0 
+          }
+
+delete :: Model_client 
+delete = Delete { config = "test.conf"
+                , name = "" &= typ "NAME" &= argPos 0 
+                }
+
+mode = modes [ create, get, put, delete ]
+
 
