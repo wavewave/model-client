@@ -28,8 +28,8 @@ Library
                    base>4, mtl>2, directory, filepath,
                    cmdargs, model-type, HEPUtil >= 0.1.1, 
                    configparser, parsec>3, bytestring>0.9, 
-                   http-enumerator, http-types, aeson>=0.3.2.12
---                   attoparsec
+                   http-enumerator, http-types, aeson<0.3.2.10,
+                   attoparsec
 
   Exposed-Modules: 
                    HEP.Automation.Model.Client.Type
