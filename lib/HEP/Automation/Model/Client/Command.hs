@@ -22,3 +22,7 @@ commandLineProcess (Delete cfg name) = do
   putStrLn "delete called"
   c <- readConfig cfg modelClientConfigParser 
   startDelete c name
+commandLineProcess (GetList cfg) = do 
+  putStrLn "getlist called"
+  c <- readConfig cfg modelClientConfigParser 
+  startGetList c 
