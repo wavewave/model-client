@@ -2,47 +2,41 @@
 
 module HEP.Automation.Model.Client.Job where
 
-import HEP.Automation.Model.Client.Config
-import HEP.Automation.Model.Type
-
-import Network.HTTP.Types hiding (statusCode)
-import Network.HTTP.Enumerator
 import qualified Data.ByteString.Lazy.Char8 as C
 import qualified Data.ByteString.Char8 as SC
-
 import Data.Aeson.Types
 import Data.Aeson.Encode
 import Data.Aeson.Parser
 import Data.Aeson.Generic as G
-
 import qualified Data.Attoparsec as A
 
+import Network.HTTP.Types hiding (statusCode)
+import Network.HTTP.Enumerator
+
+import System.Directory 
 import System.FilePath
+import Unsafe.Coerce
+
+import HEP.Automation.Model.Client.Config
+import HEP.Automation.Model.Type
+import HEP.Util.GHC.Plugins
 
 type Url = String 
 
-testmodel1 = ModelInfo { 
-  model_name = "testmodel1", 
-  model_baseurl = "http://susy.physics.lsa.umich.edu/testmodel1", 
-  model_feynrules = "testmodel1.fr", 
-  model_ufo = "testmodel1_UFO"
-}
-
-testmodel2 = ModelInfo { 
-  model_name = "testmodel2", 
-  model_baseurl = "http://susy.physics.lsa.umich.edu/testmodel2", 
-  model_feynrules = "newmodel2.fr", 
-  model_ufo = "testmodel2_UFO"
-}
-
-startCreate :: ModelConfiguration -> FilePath -> IO () 
-startCreate mc _fp = do 
+startCreate :: ModelConfiguration -> String -> IO () 
+startCreate mc mname = do 
   putStrLn "job started"
+  cwd <- getCurrentDirectory
   let url = modelconf_modelserverurl mc 
-  r <- modelToServer url ("uploadmodel") methodPost testmodel1 
-  putStrLn $ show r 
-
-
+  let fullmname = mname
+  r <- pluginCompile cwd fullmname "model"
+  case r of 
+    Left err -> putStrLn err 
+    Right value -> do 
+     let model = unsafeCoerce value :: ModelInfo
+     putStrLn $ show model 
+     response <- modelToServer url ("uploadmodel") methodPost model
+     putStrLn $ show response 
 
 startGet :: ModelConfiguration -> String -> IO () 
 startGet mc name = do 
@@ -52,16 +46,22 @@ startGet mc name = do
   putStrLn $ show r 
 
 
-startPut :: ModelConfiguration -> String -> IO () 
-startPut mc name = do 
+startPut :: ModelConfiguration 
+         -> String  -- ^ model name
+         -> String  -- ^ module name 
+         -> IO () 
+startPut mc name modname = do 
   putStrLn "job started"
+  cwd <- getCurrentDirectory
   let url = modelconf_modelserverurl mc 
-  r <- modelToServer url ("model" </> name) methodPut (testmodel2 { model_name = name }) 
-  putStrLn $ show r 
-
-
-
-
+  r <- pluginCompile cwd modname "model"
+  case r of 
+    Left err -> putStrLn err 
+    Right value -> do 
+     let model = unsafeCoerce value :: ModelInfo
+     putStrLn $ show model 
+     response <- modelToServer url ("model" </> name) methodPut model
+     putStrLn $ show response 
 
 startDelete :: ModelConfiguration -> String -> IO () 
 startDelete mc name = do 
@@ -108,8 +108,6 @@ modelToServer url api mthd mi = do
     if statusCode r == 200 
       then return . parseJson . SC.concat . C.toChunks . responseBody $ r
       else return (Left $ "status code : " ++ show (statusCode r)) 
-
-
 
 parseJson :: (FromJSON a) => SC.ByteString -> Either String (Result a)
 parseJson bs =

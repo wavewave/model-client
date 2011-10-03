@@ -5,16 +5,16 @@ module HEP.Automation.Model.Client.Type where
 import System.FilePath
 import System.Console.CmdArgs hiding (name)
 
-data Model_client = Create { config :: FilePath, content :: FilePath }
+data Model_client = Create { config :: FilePath, modulename :: String }
                   | Get    { config :: FilePath, name :: String } 
-                  | Put    { config :: FilePath, content :: FilePath } 
+                  | Put    { config :: FilePath, name :: FilePath, modulename :: String } 
                   | Delete { config :: FilePath, name :: String } 
                   | GetList { config :: FilePath } 
               deriving (Show,Data,Typeable)
 
 create :: Model_client
 create = Create { config = "test.conf"
-                , content = "" &= typ "CONTENT" &= argPos 0
+                , modulename = "" &= typ "MODULENAME" &= argPos 0
                 }
 
 get :: Model_client 
@@ -24,7 +24,8 @@ get = Get { config = "test.conf"
 
 put :: Model_client 
 put = Put { config = "test.conf"
-          , content = "" &= typ "CONTENT" &= argPos 0 
+          , name = "" &= typ "NAME" &= argPos 0 
+          , modulename = "" &= typ "NAME" &= argPos 1
           }
 
 delete :: Model_client 
