@@ -1,5 +1,5 @@
 Name:		model-client
-Version:	0.0
+Version:	0.1
 Synopsis:	client program that communicates with model-server
 Description: 	client program that communicates with model-server
 License: 	BSD3
