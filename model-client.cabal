@@ -1,5 +1,5 @@
 Name:		model-client
-Version:	0.1.999
+Version:	0.2
 Synopsis:	client program that communicates with model-server
 Description: 	client program that communicates with model-server
 License: 	BSD3
@@ -35,7 +35,6 @@ Library
                    model-type >= 0.1.999 && < 0.3, 
                    HEPUtil >= 0.1.1, 
                    configurator == 0.2.*,
-                   -- parsec == 3.1.*, 
                    bytestring == 0.9.*, 
                    http-enumerator == 0.7.*, 
                    http-types == 0.6.*, 
