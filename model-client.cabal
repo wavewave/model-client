@@ -1,5 +1,5 @@
 Name:		model-client
-Version:	0.1
+Version:	0.1.999
 Synopsis:	client program that communicates with model-server
 Description: 	client program that communicates with model-server
 License: 	BSD3
@@ -17,22 +17,33 @@ Executable model-client
   ghc-options: 	-Wall -O2 -threaded -funbox-strict-fields -fno-warn-unused-do-bind
   ghc-prof-options: -caf-all -auto-all
   Build-Depends: 
-                   base>4, mtl>2, directory, filepath,
-                   cmdargs, model-client
+                   base == 4.*, 
+                   mtl == 2.*, 
+                   cmdargs == 0.9.*, 
+                   model-client
 
 Library
   hs-source-dirs: lib
   ghc-options: 	-Wall -O2 -threaded -funbox-strict-fields -fno-warn-unused-do-bind
   ghc-prof-options: -caf-all -auto-all
   Build-Depends: 
-                   base>4, mtl>2, directory, filepath,
-                   cmdargs, model-type, HEPUtil >= 0.1.1, 
-                   configparser, parsec>3, bytestring>0.9, 
-                   http-enumerator, http-types, aeson<0.3.2.10,
-                   attoparsec
+                   base == 4.*, 
+                   mtl == 2.*, 
+                   directory == 1.1.*, 
+                   filepath == 1.2.*,
+                   cmdargs == 0.9.*, 
+                   model-type >= 0.1.999 && < 0.3, 
+                   HEPUtil >= 0.1.1, 
+                   configurator == 0.2.*,
+                   -- parsec == 3.1.*, 
+                   bytestring == 0.9.*, 
+                   http-enumerator == 0.7.*, 
+                   http-types == 0.6.*, 
+                   aeson == 0.4.*,
+                   attoparsec == 0.10.*
 
   Exposed-Modules: 
-                   HEP.Automation.Model.Client.Type
+                   HEP.Automation.Model.Client.ProgType
                    HEP.Automation.Model.Client.Job
                    HEP.Automation.Model.Client.Config
                    HEP.Automation.Model.Client.Command

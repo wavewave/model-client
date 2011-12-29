@@ -1,28 +1,29 @@
 module HEP.Automation.Model.Client.Command where
 
-import HEP.Automation.Model.Client.Type
+import HEP.Automation.Model.Client.ProgType
 import HEP.Automation.Model.Client.Job
 import HEP.Automation.Model.Client.Config
-import HEP.Util.Parsing 
+-- import HEP.Util.Parsing 
+import Data.Configurator
 
 commandLineProcess :: Model_client -> IO ()
 commandLineProcess (Create cfg mn) = do 
   putStrLn "create called"
-  c <- readConfig cfg modelClientConfigParser 
-  startCreate c mn
+  mc <- getModelClientConfiguration =<< load [Required cfg] 
+  maybe (error "cannot parse config") (flip startCreate mn) mc
 commandLineProcess (Get cfg n) = do 
   putStrLn "get called"
-  c <- readConfig cfg modelClientConfigParser 
-  startGet c n
+  mc <- getModelClientConfiguration =<< load [Required cfg] 
+  maybe (error "cannot parse config") (flip startGet n) mc
 commandLineProcess (Put cfg n mn) = do 
   putStrLn "put called"
-  c <- readConfig cfg modelClientConfigParser 
-  startPut c n mn
+  mc <- getModelClientConfiguration =<< load [Required cfg] 
+  maybe (error "cannot parse config") (\c-> startPut c n mn) mc
 commandLineProcess (Delete cfg n) = do 
   putStrLn "delete called"
-  c <- readConfig cfg modelClientConfigParser 
-  startDelete c n
+  mc <- getModelClientConfiguration =<< load [Required cfg] 
+  maybe (error "cannot parse config") (flip startDelete n) mc
 commandLineProcess (GetList cfg) = do 
   putStrLn "getlist called"
-  c <- readConfig cfg modelClientConfigParser 
-  startGetList c 
+  mc <- getModelClientConfiguration =<< load [Required cfg] 
+  maybe (error "cannot parse config") startGetList mc

@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
-module HEP.Automation.Model.Client.Type where 
+module HEP.Automation.Model.Client.ProgType where 
 
 import System.FilePath
 import System.Console.CmdArgs hiding (name)
