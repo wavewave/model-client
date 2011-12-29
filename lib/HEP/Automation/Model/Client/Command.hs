@@ -3,7 +3,6 @@ module HEP.Automation.Model.Client.Command where
 import HEP.Automation.Model.Client.ProgType
 import HEP.Automation.Model.Client.Job
 import HEP.Automation.Model.Client.Config
--- import HEP.Util.Parsing 
 import Data.Configurator
 
 commandLineProcess :: Model_client -> IO ()

@@ -9,7 +9,6 @@ import qualified Data.ByteString.Char8 as SC
 import Data.Aeson.Types
 import Data.Aeson.Encode as E
 import Data.Aeson.Parser
--- import Data.Aeson.Generic as G
 import qualified Data.Attoparsec as A
 
 import Network.HTTP.Types hiding (statusCode)
@@ -44,14 +43,6 @@ startCreate mc name = do
   response <- modelToServer url ("uploadmodel") methodPost info
   putStrLn $ show response 
 
-  --  r <- pluginCompile cwd fullmname "model"
-  -- case r of 
-  --   Left err -> putStrLn err 
-  --   Right value -> do 
-  --   let model = unsafeCoerce value :: ModelInfo
-  --    putStrLn $ show model 
-  --   response <- modelToServer url ("uploadmodel") methodPost model
-  --   putStrLn $ show response 
 
 startGet :: ModelClientConfiguration -> String -> IO () 
 startGet mc idee = do 
@@ -75,14 +66,6 @@ startPut mc idee name = do
   response <- modelToServer url ("model" </> idee) methodPut info
   putStrLn $ show response 
 
-  --  r <- pluginCompile cwd modname "model"
-  --case r of 
-  --  Left err -> putStrLn err 
-  --  Right value -> do 
-  --   let model = unsafeCoerce value :: ModelInfo
-  --   putStrLn $ show model 
-  --   response <- modelToServer url ("model" </> name) methodPut model
-  --   putStrLn $ show response 
 
 startDelete :: ModelClientConfiguration -> String -> IO () 
 startDelete mc idee = do 
@@ -106,8 +89,7 @@ jsonFromServer url api mthd = do
   withManager $ \manager -> do
     let requestjson = request { 
           method = mthd,
-          requestHeaders = [ ("Accept", "application/json; charset=utf-8") ] 
-        } 
+          requestHeaders = [ ("Accept", "application/json; charset=utf-8") ] } 
     r <- httpLbs requestjson manager 
     if statusCode r == 200 
       then return . parseJson . SC.concat . C.toChunks . responseBody $ r
@@ -122,9 +104,7 @@ modelToServer url api mthd mi = do
     let requestjson = request 
           { method = mthd
           , requestHeaders = [ ("Accept", "application/json; charset=utf-8") ]
-          , requestBody = myrequestbody
-          } 
-
+          , requestBody = myrequestbody } 
     r <- httpLbs requestjson manager 
     if statusCode r == 200 
       then return . parseJson . SC.concat . C.toChunks . responseBody $ r
