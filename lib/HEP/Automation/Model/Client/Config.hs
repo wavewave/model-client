@@ -10,13 +10,15 @@ import Data.Configurator.Types
 -- import HEP.Parser.Config
 
 data ModelClientConfiguration = ModelClientConfiguration { 
-  modelServerURL :: String
+  modelServerURL :: String,
+  modelClientURL :: String
 } deriving (Show)
 
 getModelClientConfiguration :: Config -> IO (Maybe ModelClientConfiguration)
-getModelClientConfiguration config = 
-  C.lookup config "server" >>= return . fmap ModelClientConfiguration 
-
+getModelClientConfiguration config = do  
+  s <- C.lookup config "server" 
+  c <- C.lookup config "client" 
+  return  (ModelClientConfiguration  <$> s <*> c )
 {-
 modelClientConfigParser :: ParsecT String () Identity ModelConfiguration 
 modelClientConfigParser =

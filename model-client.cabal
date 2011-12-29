@@ -33,13 +33,14 @@ Library
                    filepath == 1.2.*,
                    cmdargs == 0.9.*, 
                    model-type >= 0.1.999 && < 0.3, 
-                   HEPUtil >= 0.1.1, 
                    configurator == 0.2.*,
                    bytestring == 0.9.*, 
                    http-enumerator == 0.7.*, 
                    http-types == 0.6.*, 
                    aeson == 0.4.*,
-                   attoparsec == 0.10.*
+                   attoparsec == 0.10.*, 
+                   time == 1.2.*, 
+                   uuid == 1.2.*
 
   Exposed-Modules: 
                    HEP.Automation.Model.Client.ProgType

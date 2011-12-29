@@ -2,12 +2,14 @@
 
 module HEP.Automation.Model.Client.Job where
 
+import Debug.Trace
+
 import qualified Data.ByteString.Lazy.Char8 as C
 import qualified Data.ByteString.Char8 as SC
 import Data.Aeson.Types
 import Data.Aeson.Encode as E
 import Data.Aeson.Parser
-import Data.Aeson.Generic as G
+-- import Data.Aeson.Generic as G
 import qualified Data.Attoparsec as A
 
 import Network.HTTP.Types hiding (statusCode)
@@ -19,55 +21,74 @@ import Unsafe.Coerce
 
 import HEP.Automation.Model.Client.Config
 import HEP.Automation.Model.Type
-import HEP.Util.GHC.Plugins
+import Data.UUID
+import Data.UUID.V5
+import qualified Data.ByteString as B
+import Data.Time.Clock
 
 type Url = String 
 
+nextUUID :: ModelClientConfiguration -> IO UUID
+nextUUID mc = do 
+  let c = modelClientURL mc 
+  t <- getCurrentTime 
+  return . generateNamed namespaceURL . B.unpack . SC.pack $ c ++ "/" ++ show t 
+
 startCreate :: ModelClientConfiguration -> String -> IO () 
-startCreate mc mname = do 
+startCreate mc name = do 
   putStrLn "job started"
   cwd <- getCurrentDirectory
   let url = modelServerURL mc 
-  let fullmname = mname
-  r <- pluginCompile cwd fullmname "model"
-  case r of 
-    Left err -> putStrLn err 
-    Right value -> do 
-     let model = unsafeCoerce value :: ModelInfo
-     putStrLn $ show model 
-     response <- modelToServer url ("uploadmodel") methodPost model
-     putStrLn $ show response 
+  uuid <- nextUUID mc
+  let info = ModelInfo { model_uuid = uuid , model_name = name } 
+  response <- modelToServer url ("uploadmodel") methodPost info
+  putStrLn $ show response 
+
+  --  r <- pluginCompile cwd fullmname "model"
+  -- case r of 
+  --   Left err -> putStrLn err 
+  --   Right value -> do 
+  --   let model = unsafeCoerce value :: ModelInfo
+  --    putStrLn $ show model 
+  --   response <- modelToServer url ("uploadmodel") methodPost model
+  --   putStrLn $ show response 
 
 startGet :: ModelClientConfiguration -> String -> IO () 
-startGet mc name = do 
-  putStrLn $"get " ++ name
+startGet mc idee = do 
+  putStrLn $"get " ++ idee
   let url = modelServerURL mc 
-  r <- jsonFromServer url ("model" </> name) methodGet
+  r <- jsonFromServer url ("model" </> idee) methodGet
   putStrLn $ show r 
 
 
 startPut :: ModelClientConfiguration 
-         -> String  -- ^ model name
-         -> String  -- ^ module name 
+         -> String  -- ^ model idee
+         -> String  -- ^ model name 
          -> IO () 
-startPut mc name modname = do 
+startPut mc idee name = do 
   putStrLn "job started"
   cwd <- getCurrentDirectory
   let url = modelServerURL mc 
-  r <- pluginCompile cwd modname "model"
-  case r of 
-    Left err -> putStrLn err 
-    Right value -> do 
-     let model = unsafeCoerce value :: ModelInfo
-     putStrLn $ show model 
-     response <- modelToServer url ("model" </> name) methodPut model
-     putStrLn $ show response 
+      info = case fromString idee of 
+               Nothing -> error "strange in startPut" 
+               Just idee' -> ModelInfo { model_uuid = idee', model_name = name }
+  response <- modelToServer url ("model" </> idee) methodPut info
+  putStrLn $ show response 
+
+  --  r <- pluginCompile cwd modname "model"
+  --case r of 
+  --  Left err -> putStrLn err 
+  --  Right value -> do 
+  --   let model = unsafeCoerce value :: ModelInfo
+  --   putStrLn $ show model 
+  --   response <- modelToServer url ("model" </> name) methodPut model
+  --   putStrLn $ show response 
 
 startDelete :: ModelClientConfiguration -> String -> IO () 
-startDelete mc name = do 
+startDelete mc idee = do 
   putStrLn "job started"
   let url = modelServerURL mc 
-  r <- jsonFromServer url ("model" </> name) methodDelete
+  r <- jsonFromServer url ("model" </> idee) methodDelete
   putStrLn $ show r 
 
 
@@ -96,7 +117,7 @@ modelToServer :: Url -> String -> Method -> ModelInfo -> IO (Either String (Resu
 modelToServer url api mthd mi = do 
   request <- parseUrl (url </> api)
   withManager $ \manager -> do
-    let mijson = E.encode (G.toJSON mi)
+    let mijson = E.encode (toJSON mi)
         myrequestbody = RequestBodyLBS mijson 
     let requestjson = request 
           { method = mthd
@@ -111,7 +132,7 @@ modelToServer url api mthd mi = do
 
 parseJson :: (FromJSON a) => SC.ByteString -> Either String (Result a)
 parseJson bs =
-  let resultjson = A.parse json bs 
+  let resultjson = trace (SC.unpack bs) $ A.parse json bs 
   in case resultjson of 
        (A.Done rest rjson) -> return (parse parseJSON rjson)
-       _                 -> Left "error" 
+       _                 -> Left "parseJson" 
