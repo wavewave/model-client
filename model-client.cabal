@@ -32,7 +32,7 @@ Library
                    directory == 1.1.*, 
                    filepath == 1.2.*,
                    cmdargs == 0.9.*, 
-                   model-type >= 0.1.999 && < 0.3, 
+                   model-type == 0.2.*,
                    configurator == 0.2.*,
                    bytestring == 0.9.*, 
                    http-enumerator == 0.7.*, 
